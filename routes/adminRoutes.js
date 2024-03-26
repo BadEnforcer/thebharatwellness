@@ -1,38 +1,52 @@
 import { Router } from "express"
-
 const adminRouter = Router()
 
-adminRoutes.get('/', (req, res) => {
-    res.send('Welcome to the admin portal, please login')
+// # import middlewares 
+import { isAdmin, isSuperAdmin, checkAdminAccess, CheckUserAuthentication } from "../middlewares/adminMiddlewares.js"
+
+
+//# important NOTE: make sure the order of middlewares is correct. else normal users will be able to access the admin page
+adminRouter.get('/', CheckUserAuthentication, checkAdminAccess, (req, res) => {
+    res.send('Welcome to the admin portal, please login') // TODO: send the admin login page
 })
 
 
-adminRoutes.get('/dashboard', (req, res) => { // TODO: implement user id check for all routes
+adminRouter.get('/dashboard', checkAdminAccess, (req, res) => { // TODO: implement user id check for all routes
     res.send('this is dashboard')
 })
 
 //#region BLOGS management
-adminRoutes.get('/dashboard/blogs', (req, res) => {
-    res.send('here is the blogs dashboard')
+adminRouter.get('/dashboard/blogs', checkAdminAccess, (req, res) => {
+    res.send('here is the blogs dashboard') // TODO: this is where stats will be displayed
 })
 
-adminRoutes.get('/dashboard/blogs/manage', (req, res) => {
+adminRouter.get('/dashboard/blogs/manage', isAdmin, (req, res) => {
     res.send('this page allows you to see all available commands')
 })
 
-adminRoutes.get('/dashboard/blogs/manage/create_new', (req, res) => {
+adminRouter.get('/dashboard/blogs/manage/create_new', isAdmin, (req, res) => {
     res.send('you can create blogs from this page')
 })
 
-adminRoutes.get('/dashboard/blogs/manage/update', (req, res) => {
+adminRouter.get('/dashboard/blogs/manage/update', isAdmin, (req, res) => {
     res.send('you can update/edit blogs from this page with both blog id and searching')
 })
 
-adminRoutes.get('/dashboard/blogs/manage/delete', (req, res) => {
+adminRouter.get('/dashboard/blogs/manage/delete', isAdmin, (req, res) => {
     res.send('you can delete blogs from this page using blog id')
 })
 
 //#endregion BLOGS management
+
+adminRouter.get('/dashboard/orders', checkAdminAccess, (req, res) => {
+    res.send('You will view order history here')
+});
+
+adminRouter.get('/dashboard/payments', checkAdminAccess, (req, res) => {
+    res.send('You will view payment history here')
+});
+
+
 
 
 

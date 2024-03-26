@@ -3,18 +3,24 @@ import debug from 'debug';
 
 const homeRouter = Router()
 
-homeRoutes.get('/', (req, res) => {
+homeRouter.get('/', (req, res) => {
     debug('app')('serving homepage')
     res.send('homepage');
 })
 
 
-homeRoutes.get('/about', (req,res) => {
+homeRouter.get('/about', (req,res) => {
     res.send('about is page')
 })
 
-homeRoutes.get('/contact', (req, res) => {
+homeRouter.get('/contact', (req, res) => {
     res.send('Contact us page')
 })
+
+app.post('/login', passport.authenticate('local', {
+    successReturnToOrRedirect: '/',
+    failureRedirect: '/login',
+    failureFlash: true
+}));
 
 export default homeRouter

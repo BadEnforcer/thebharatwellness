@@ -1,0 +1,2 @@
+1. implement googleOAuth login
+2. the main login route is /login without any prefix

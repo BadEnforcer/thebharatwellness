@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Documentation: Handling Unauthenticated Users During a POST Request</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        h1, h2 {
+            color: #333;
+        }
+        pre {
+            background-color: #f0f0f0;
+            padding: 10px;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Documentation: Handling Unauthenticated Users During a POST Request</h1>
+    <p>In our application, we have implemented a mechanism to handle scenarios where a user is not authenticated during a POST request. This is particularly useful for routes that require user authentication.</p>
+
+    <h2>Middleware: def_isUserAuthenticated</h2>
+    <p>We use a middleware function <code>def_isUserAuthenticated</code> that checks if a user is authenticated. This middleware is used in the route handlers before processing the POST request.</p>
+    <pre>
+export async function def_isUserAuthenticated(req, res, next){
+    if(req.user.isAuthenticated()){
+        return next()
+    } else {
+        req.session.returnTo = req.originalUrl
+        if (req.method === 'POST') {
+            req.session.postData = req.body
+        }
+        res.redirect('/login')
+    }
+}
+    </pre>
+
+    <h2>Login Route</h2>
+    <p>After successful login, the user is redirected back to the original URL. This is handled in the login route using the <code>successReturnToOrRedirect</code> option of <code>passport.authenticate</code>.</p>
+    <pre>
+app.post('/login', passport.authenticate('local', {
+    successReturnToOrRedirect: '/',
+    failureRedirect: '/login',
+    failureFlash: true
+}));
+    </pre>
+
+    <h2>Original Route Handler</h2>
+    <p>In the route handler for the original URL, we retrieve the POST data stored in the session and handle it accordingly. This ensures that the user does not have to fill out the form again.</p>
+    <pre>
+app.post('/originalUrl', (req, res) => {
+    const postData = req.session.postData || req.body
+    delete req.session.postData
+    // handle postData...
+});
+    </pre>
+
+    <p>This mechanism provides a smooth user experience by preserving the user's input and redirecting them back to their original task after login.</p>
+</body>
+</html>
